@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AWC IIT ROPAR — Animal Welfare Committee</title>
+  <meta name="description" content="Official Animal Welfare Committee Portal, IIT Ropar. Dedicated to the care, identification, vaccination, and protection of campus dogs, cats, and wild birds. Vasudhaiva Kutumbakam.">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Supabase JS Client (CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <!-- APP HEADER -->
+  <header class="app-header">
+    <div class="brand-container" onclick="app.showScreen('screen-welcome')">
+      <div class="brand-logo-icon">
+        <i class="fa-solid fa-paw"></i>
+      </div>
+      <div class="brand-text-box">
+        <h1>AWC IIT ROPAR</h1>
+        <span>Animal Welfare Committee</span>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button class="icon-btn" onclick="app.toggleTheme()" title="Toggle Dark/Light Mode">
+        <i class="fa-solid fa-moon" id="theme-icon"></i>
+      </button>
+      <button class="admin-badge-btn" onclick="app.openAdminPortal()">
+        <i class="fa-solid fa-shield-halved"></i> Admin Portal
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN WRAPPER -->
+  <main class="main-wrapper">
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- NAVIGATION BACK BAR (For sub-screens) -->
+    <div class="nav-back-bar" id="nav-back-bar" style="display: none;">
+      <button class="btn-back" onclick="app.goBack()">
+        <i class="fa-solid fa-arrow-left"></i> <span id="back-btn-label">Back</span>
+      </button>
+    </div>
+
+    <!-- ==========================================
+         SCREEN 1: WELCOME / LANDING SCREEN
+         ========================================== -->
+    <section id="screen-welcome" class="view-section active">
+      <div class="hero-welcome-card">
+        <div class="slogan-badge">
+          "वसुधैव कुटुम्बकम्"
+          <span class="slogan-meaning">— The Whole World is One Family</span>
+        </div>
+
+        <h2>Animal Welfare Committee<br><span style="color: var(--primary);">IIT ROPAR</span></h2>
+        
+        <p class="subtitle">
+          Welcoming you to our campus sanctuary portal. Discover, track, and protect our friendly campus dogs, cozy cats, and vibrant campus wild birds.
+        </p>
+
+        <div class="campus-highlights">
+          <div class="highlight-chip">
+            <i class="fa-solid fa-dog"></i> Campus Dogs Registry
+          </div>
+          <div class="highlight-chip">
+            <i class="fa-solid fa-cat"></i> Campus Cats Care
+          </div>
+          <div class="highlight-chip">
+            <i class="fa-solid fa-feather"></i> Wild Birds Catalogue
+          </div>
+          <div class="highlight-chip">
+            <i class="fa-solid fa-syringe"></i> Vaccination Tracker
+          </div>
+        </div>
+
+        <button class="btn-cta" onclick="app.showScreen('screen-category-select')">
+          <span>Begin Exploration</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SCREEN 2: SELECT ANIMAL OR BIRD
+         ========================================== -->
+    <section id="screen-category-select" class="view-section">
+      <div class="section-title-box">
+        <h2>What would you like to explore?</h2>
+        <p>Please select a category below to view campus residents</p>
+      </div>
+
+      <div class="selection-grid">
+        <!-- ANIMAL CARD -->
+        <div class="photo-selection-card" onclick="app.showScreen('screen-animal-type-select')">
+          <div class="card-img-wrapper">
+            <img src="images/animal-card.jpg" alt="Campus Animals" id="img-animal-category">
+            <div class="card-img-badge">🐾</div>
+          </div>
+          <div class="card-content">
+            <h3>Animals</h3>
+            <p>Explore our beloved campus dogs and cats residing across hostels & academic blocks.</p>
+            <div class="card-cta-btn">
+              <span>Choose Animal</span> <i class="fa-solid fa-chevron-right"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- BIRD CARD -->
+        <div class="photo-selection-card" onclick="app.loadListings('bird')">
+          <div class="card-img-wrapper">
+            <img src="images/bird-card.jpg" alt="Campus Birds" id="img-bird-category">
+            <div class="card-img-badge">🐦</div>
+          </div>
+          <div class="card-content">
+            <h3>Birds</h3>
+            <p>Discover the diverse wild avian species nesting and soaring in our lush campus grounds.</p>
+            <div class="card-cta-btn">
+              <span>View Wild Birds</span> <i class="fa-solid fa-chevron-right"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SCREEN 3: SELECT CAT OR DOG
+         ========================================== -->
+    <section id="screen-animal-type-select" class="view-section">
+      <div class="section-title-box">
+        <h2>Which animal would you like to see?</h2>
+        <p>Select Dog or Cat to view their individual campus profiles</p>
+      </div>
+
+      <div class="selection-grid">
+        <!-- DOG CARD -->
+        <div class="photo-selection-card" onclick="app.loadListings('dog')">
+          <div class="card-img-wrapper">
+            <img src="images/dog-card.jpg" alt="Campus Dogs" id="img-dog-category">
+            <div class="card-img-badge">🐕</div>
+          </div>
+          <div class="card-content">
+            <h3>Campus Dogs</h3>
+            <p>View profiles, vaccination logs, sterilization status, and territories of campus dogs.</p>
+            <div class="card-cta-btn">
+              <span>View Campus Dogs</span> <i class="fa-solid fa-chevron-right"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- CAT CARD -->
+        <div class="photo-selection-card" onclick="app.loadListings('cat')">
+          <div class="card-img-wrapper">
+            <img src="images/cat-card.jpg" alt="Campus Cats" id="img-cat-category">
+            <div class="card-img-badge">🐈</div>
+          </div>
+          <div class="card-content">
+            <h3>Campus Cats</h3>
+            <p>Meet our friendly campus cats, their favorite spots, age, and health records.</p>
+            <div class="card-cta-btn">
+              <span>View Campus Cats</span> <i class="fa-solid fa-chevron-right"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SCREEN 4: LISTING VIEW (Dogs / Cats / Birds)
+         ========================================== -->
+    <section id="screen-listings" class="view-section">
+      <div class="section-title-box" style="text-align: left;">
+        <h2 id="listing-heading-title">Campus Animals</h2>
+        <p id="listing-heading-subtitle">Detailed profiles and welfare information</p>
+      </div>
+
+      <!-- Filter & Search Bar -->
+      <div class="list-filter-bar">
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input type="text" id="search-input" placeholder="Search by name, location, or trait..." onkeyup="app.filterListings()">
+        </div>
+        <div class="filter-pills">
+          <button class="pill-filter active" onclick="app.setFilterTag('all', this)">All</button>
+          <button class="pill-filter" onclick="app.setFilterTag('vax', this)">💉 Vaccinated</button>
+          <button class="pill-filter" onclick="app.setFilterTag('neutered', this)">✂️ Sterilized</button>
+        </div>
+      </div>
+
+      <!-- Animal Cards Grid -->
+      <div class="animals-grid" id="animals-container">
+        <!-- Rendered dynamically via app.js -->
+      </div>
+
+      <!-- REPORT CTA BOX -->
+      <div class="report-cta-card">
+        <h3>Spotted a new Dog, Cat, or Bird on Campus?</h3>
+        <p>Help AWC IIT Ropar keep our animal registry up to date. You can report a new animal sighting or upload their photos!</p>
+        <button class="btn-cta" onclick="app.openReportForm()">
+          <i class="fa-solid fa-plus-circle"></i>
+          <span>Report New Animal / Bird</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SCREEN 5: REPORT FORM (Public Submission)
+         ========================================== -->
+    <section id="screen-report-form" class="view-section">
+      <div class="form-card">
+        <div class="section-title-box">
+          <h2>Report a New Campus Animal / Bird</h2>
+          <p>Submit details to help AWC track & care for new campus residents</p>
+        </div>
+
+        <form id="report-form" onsubmit="app.handleReportSubmit(event)">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="report-type">Category *</label>
+              <select id="report-type" required onchange="app.toggleReportFields(this.value)">
+                <option value="dog">🐕 Dog</option>
+                <option value="cat">🐈 Cat</option>
+                <option value="bird">🐦 Wild Bird</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="report-name">Name / Given Title *</label>
+              <input type="text" id="report-name" placeholder="e.g. Charlie or Golden Sparrow" required>
+            </div>
+
+            <div class="form-group">
+              <label for="report-species">Breed / Species</label>
+              <input type="text" id="report-species" placeholder="e.g. Indian Pariah / Indian Peafowl">
+            </div>
+
+            <div class="form-group">
+              <label for="report-age">Approx Age</label>
+              <input type="text" id="report-age" placeholder="e.g. 2 Years / Young Adult">
+            </div>
+
+            <div class="form-group full-width">
+              <label for="report-location">Permanent Residing Place *</label>
+              <input type="text" id="report-location" placeholder="e.g. Near Hostel 4 Lawn / CSE Department" required>
+            </div>
+
+            <div class="form-group">
+              <label for="report-behavior">Average Behaviour to Humans</label>
+              <input type="text" id="report-behavior" placeholder="e.g. Friendly, Shy, Protective, Playful">
+            </div>
+
+            <div class="form-group">
+              <label for="report-vax">Vaccination Status</label>
+              <select id="report-vax">
+                <option value="Vaccinated (Up-to-date)">Vaccinated (Up-to-date)</option>
+                <option value="Pending / Needs Vax">Pending / Needs Vax</option>
+                <option value="N/A (Wild Species)">N/A (Wild Species)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="report-sterilization">Sterilization Status</label>
+              <select id="report-sterilization">
+                <option value="Sterilized">Sterilized / Neutered</option>
+                <option value="Not Sterilized">Not Sterilized</option>
+                <option value="N/A (Wild Species)">N/A (Wild Species)</option>
+              </select>
+            </div>
+
+            <div class="form-group full-width">
+              <label for="report-speciality">Speciality / Unique Trait</label>
+              <input type="text" id="report-speciality" placeholder="e.g. White patch on left ear, loves eating biscuits">
+            </div>
+
+            <!-- Photo Upload Field -->
+            <div class="form-group full-width">
+              <label>Animal Photo *</label>
+              <div class="photo-upload-container" onclick="document.getElementById('report-photo-file').click()">
+                <i class="fa-solid fa-cloud-arrow-up" style="font-size: 2rem; color: var(--primary);"></i>
+                <p style="margin-top: 0.5rem; font-weight: 600;">Click to Upload Animal Photo</p>
+                <span style="font-size: 0.8rem; color: var(--text-muted);">Supports JPG, PNG, WEBP</span>
+                <input type="file" id="report-photo-file" accept="image/*" style="display: none;" onchange="app.handleFileSelect(event, 'report-photo-preview', 'report-photo-url')">
+                <input type="hidden" id="report-photo-url">
+                <br>
+                <img id="report-photo-preview" class="photo-preview-img" alt="Preview">
+              </div>
+            </div>
+
+            <div class="form-group full-width">
+              <label for="report-user">Your Name & Dept/Hostel (Optional)</label>
+              <input type="text" id="report-user" placeholder="e.g. Rahul, B.Tech CSE, Hostel 2">
+            </div>
+          </div>
+
+          <button type="submit" class="btn-submit">
+            <i class="fa-solid fa-paper-plane"></i> Submit Animal Sighting
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SCREEN 6: ADMIN AUTH & DASHBOARD (Secure)
+         ========================================== -->
+    <section id="screen-admin-auth" class="view-section">
+      <div class="auth-card">
+        <div class="auth-icon-badge">
+          <i class="fa-solid fa-user-shield"></i>
+        </div>
+        <h2>AWC Admin Verification</h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
+          2-Factor Hacker-Proof Access. Please enter the Security Admin PIN to proceed.
+        </p>
+
+        <form onsubmit="app.verifyAdminPin(event)">
+          <label style="font-weight: 600; font-size: 0.9rem;">4-Digit Security PIN</label>
+          <div class="pin-input-group">
+            <input type="password" class="pin-digit" maxlength="1" id="pin-1" autofocus onkeyup="app.focusNextPin(this, 'pin-2')">
+            <input type="password" class="pin-digit" maxlength="1" id="pin-2" onkeyup="app.focusNextPin(this, 'pin-3')">
+            <input type="password" class="pin-digit" maxlength="1" id="pin-3" onkeyup="app.focusNextPin(this, 'pin-4')">
+            <input type="password" class="pin-digit" maxlength="1" id="pin-4" onkeyup="app.focusNextPin(this, null)">
+          </div>
+
+          <button type="submit" class="btn-submit">Unlock Admin Dashboard</button>
+        </form>
+        <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 1rem;">
+          Default PIN is <code>1234</code>. You can change this anytime inside Admin Settings.
+        </p>
+      </div>
+    </section>
+
+    <!-- ADMIN DASHBOARD -->
+    <section id="screen-admin-dashboard" class="view-section">
+      <div class="section-title-box" style="text-align: left;">
+        <h2><i class="fa-solid fa-shield-cat" style="color: var(--primary);"></i> Admin Control Panel</h2>
+        <p>Manage campus animals, approve student reports & edit photo listings</p>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <div class="admin-header-tabs">
+        <button class="tab-btn active" onclick="app.switchAdminTab('tab-manage')">
+          <i class="fa-solid fa-list-check"></i> Manage Registry (<span id="count-all">0</span>)
+        </button>
+        <button class="tab-btn" onclick="app.switchAdminTab('tab-pending')">
+          <i class="fa-solid fa-clock-history"></i> Pending Reports (<span id="count-pending">0</span>)
+        </button>
+        <button class="tab-btn" onclick="app.switchAdminTab('tab-settings')">
+          <i class="fa-solid fa-sliders"></i> Security & Settings
+        </button>
+      </div>
+
+      <!-- TAB 1: MANAGE REGISTRY -->
+      <div id="tab-manage" class="admin-tab-content active">
+        <div class="admin-action-bar">
+          <h3 style="font-size: 1.2rem;">All Campus Animals & Birds</h3>
+          <button class="btn-cta" style="padding: 0.6rem 1.2rem; font-size: 0.92rem;" onclick="app.openAddAnimalModal()">
+            <i class="fa-solid fa-plus"></i> Add New Animal / Bird
+          </button>
+        </div>
+
+        <div class="table-responsive">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Photo</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Location</th>
+                <th>Vaccination</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="admin-table-body">
+              <!-- Rendered via app.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB 2: PENDING REPORTS -->
+      <div id="tab-pending" class="admin-tab-content" style="display: none;">
+        <div class="admin-action-bar">
+          <h3>User-Submitted Sightings Awaiting Approval</h3>
+        </div>
+        <div class="table-responsive">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Photo</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Location</th>
+                <th>Reported By</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="pending-table-body">
+              <!-- Rendered via app.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB 3: SECURITY & SETTINGS -->
+      <div id="tab-settings" class="admin-tab-content" style="display: none;">
+        <div class="form-card" style="margin: 0; max-width: 100%;">
+          <h3>Security & Storage Settings</h3>
+          <br>
+          <div class="form-grid">
+            <div class="form-group full-width">
+              <label for="setting-pin">Change Admin Security PIN</label>
+              <input type="password" id="setting-pin" placeholder="Enter new 4-digit PIN">
+              <button type="button" class="btn-submit" style="width: auto; padding: 0.5rem 1.2rem;" onclick="app.saveNewPin()">
+                Update PIN
+              </button>
+            </div>
+
+            <hr class="full-width" style="border: 0; border-top: 1px solid var(--border-color); margin: 1rem 0;">
+
+            <div class="form-group full-width">
+              <label for="setting-supabase-url">Supabase Project URL (Optional Cloud Database)</label>
+              <input type="text" id="setting-supabase-url" placeholder="https://your-project.supabase.co">
+            </div>
+
+            <div class="form-group full-width">
+              <label for="setting-supabase-key">Supabase Anon Key</label>
+              <input type="text" id="setting-supabase-key" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6...">
+              <button type="button" class="btn-submit" style="width: auto; padding: 0.5rem 1.2rem;" onclick="app.saveSupabaseConfig()">
+                Save Supabase Credentials
+              </button>
+            </div>
+
+            <hr class="full-width" style="border: 0; border-top: 1px solid var(--border-color); margin: 1rem 0;">
+
+            <div class="form-group full-width">
+              <label>Data Backup & Restore</label>
+              <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <button type="button" class="btn-back" style="border: 1px solid var(--border-color);" onclick="app.exportDataBackup()">
+                  <i class="fa-solid fa-download"></i> Export JSON Backup
+                </button>
+                <button type="button" class="btn-back" style="border: 1px solid var(--border-color);" onclick="app.resetDemoData()">
+                  <i class="fa-solid fa-rotate"></i> Reset Demo Data
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==========================================
+       MODAL: ADD / EDIT ANIMAL (ADMIN)
+       ========================================== -->
+  <div class="modal-overlay" id="animal-modal">
+    <div class="modal-content">
+      <button class="modal-close-btn" onclick="app.closeModal('animal-modal')">&times;</button>
+      <h3 id="modal-title">Add New Campus Animal / Bird</h3>
+      <br>
+      <form id="admin-animal-form" onsubmit="app.handleAdminSaveAnimal(event)">
+        <input type="hidden" id="modal-animal-id">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="modal-type">Type *</label>
+            <select id="modal-type" required>
+              <option value="dog">🐕 Dog</option>
+              <option value="cat">🐈 Cat</option>
+              <option value="bird">🐦 Bird</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="modal-name">Name *</label>
+            <input type="text" id="modal-name" required>
+          </div>
+
+          <div class="form-group">
+            <label for="modal-species">Species / Breed</label>
+            <input type="text" id="modal-species">
+          </div>
+
+          <div class="form-group">
+            <label for="modal-age">Approx Age</label>
+            <input type="text" id="modal-age">
+          </div>
+
+          <div class="form-group full-width">
+            <label for="modal-location">Permanent Residing Place *</label>
+            <input type="text" id="modal-location" required>
+          </div>
+
+          <div class="form-group">
+            <label for="modal-behavior">Average Behaviour to Humans</label>
+            <input type="text" id="modal-behavior">
+          </div>
+
+          <div class="form-group">
+            <label for="modal-vax">Vaccination Status</label>
+            <select id="modal-vax">
+              <option value="Vaccinated (Up-to-date)">Vaccinated (Up-to-date)</option>
+              <option value="Pending / Needs Vax">Pending / Needs Vax</option>
+              <option value="N/A (Wild Species)">N/A (Wild Species)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="modal-sterilization">Sterilization Status</label>
+            <select id="modal-sterilization">
+              <option value="Sterilized">Sterilized / Neutered</option>
+              <option value="Not Sterilized">Not Sterilized</option>
+              <option value="N/A (Wild Species)">N/A (Wild Species)</option>
+            </select>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="modal-speciality">Speciality / Unique Trait</label>
+            <input type="text" id="modal-speciality">
+          </div>
+
+          <!-- Photo Upload & URL -->
+          <div class="form-group full-width">
+            <label>Upload Photo / Image URL *</label>
+            <div class="photo-upload-container" onclick="document.getElementById('modal-photo-file').click()">
+              <i class="fa-solid fa-camera" style="font-size: 1.8rem; color: var(--primary);"></i>
+              <p style="margin-top: 0.3rem;">Choose Photo File from Device</p>
+              <input type="file" id="modal-photo-file" accept="image/*" style="display: none;" onchange="app.handleFileSelect(event, 'modal-photo-preview', 'modal-photo-url')">
+              <input type="hidden" id="modal-photo-url">
+              <img id="modal-photo-preview" class="photo-preview-img" alt="Preview">
+            </div>
+            <p style="text-align: center; margin: 0.5rem 0; font-size: 0.8rem; color: var(--text-muted);">— OR paste an image URL below —</p>
+            <input type="text" id="modal-photo-url-input" placeholder="https://example.com/photo.jpg" oninput="document.getElementById('modal-photo-url').value=this.value">
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit">Save Animal Profile</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- APP FOOTER -->
+  <footer class="app-footer">
+    <div class="footer-quote">"वसुधैव कुटुम्बकम्"</div>
+    <p>Official Portal of Animal Welfare Committee (AWC), IIT Ropar</p>
+    <p style="font-size: 0.78rem; margin-top: 0.5rem; color: var(--text-muted);">
+      Crafted for better cause • Hosted free on GitHub Pages • Admin Secured
+    </p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/supabase-config.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
