@@ -30,9 +30,14 @@
     </div>
 
     <div class="header-actions">
+      <button class="join-cause-btn" onclick="app.openModal('join-cause-modal')">
+        <i class="fa-solid fa-hand-holding-heart"></i> Join Our Cause
+      </button>
+
       <button class="icon-btn" onclick="app.toggleTheme()" title="Toggle Dark/Light Mode">
         <i class="fa-solid fa-moon" id="theme-icon"></i>
       </button>
+
       <button class="admin-badge-btn" onclick="app.openAdminPortal()">
         <i class="fa-solid fa-shield-halved"></i> Admin Portal
       </button>
@@ -83,10 +88,16 @@
           </div>
         </div>
 
-        <button class="btn-cta" onclick="app.showScreen('screen-category-select')">
-          <span>Begin Exploration</span>
-          <i class="fa-solid fa-arrow-right"></i>
-        </button>
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+          <button class="btn-cta" onclick="app.showScreen('screen-category-select')">
+            <span>Begin Exploration</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+          <button class="btn-cta" style="background: var(--accent);" onclick="app.showScreen('screen-news')">
+            <i class="fa-solid fa-newspaper"></i>
+            <span>AWC Works & News</span>
+          </button>
+        </div>
       </div>
     </section>
 
@@ -213,6 +224,55 @@
     </section>
 
     <!-- ==========================================
+         SCREEN: NEWS & CAMPUS WORKS
+         ========================================== -->
+    <section id="screen-news" class="view-section">
+      <div class="section-title-box">
+        <h2>📰 AWC News & Campus Works</h2>
+        <p>Latest updates, vaccination drives, rescue missions & welfare initiatives at IIT Ropar</p>
+      </div>
+
+      <div class="news-grid" id="news-container">
+        <!-- Demo News Cards -->
+        <article class="news-card">
+          <div class="news-img-box">
+            <img src="images/animal-card.jpg" alt="Vaccination Drive">
+            <span class="news-tag">Vaccination Drive</span>
+          </div>
+          <div class="news-content">
+            <span class="news-date"><i class="fa-regular fa-calendar"></i> August 2026</span>
+            <h3>Annual Anti-Rabies Vaccination Completed for Campus Dogs</h3>
+            <p>AWC IIT Ropar team successfully vaccinated campus dogs in collaboration with local veterinary experts. All vaccinated animals are tagged for monitoring.</p>
+          </div>
+        </article>
+
+        <article class="news-card">
+          <div class="news-img-box">
+            <img src="images/bird-card.jpg" alt="Bird Water Bowls">
+            <span class="news-tag">Campus Welfare</span>
+          </div>
+          <div class="news-content">
+            <span class="news-date"><i class="fa-regular fa-calendar"></i> July 2026</span>
+            <h3>Installation of Clay Water Bowls for Birds & Animals</h3>
+            <p>Over 30 eco-friendly water bowls installed near student hostels, department lawns, and tree canopies to ensure fresh drinking water for campus wildlife.</p>
+          </div>
+        </article>
+
+        <article class="news-card">
+          <div class="news-img-box">
+            <img src="images/cat-card.jpg" alt="Health Checkup">
+            <span class="news-tag">Rescue & Care</span>
+          </div>
+          <div class="news-content">
+            <span class="news-date"><i class="fa-regular fa-calendar"></i> June 2026</span>
+            <h3>Routine Health Screening & Feeding Schedules</h3>
+            <p>Student volunteers maintain dedicated feeding spots and regular health screening to keep our campus cat population safe, healthy, and sterilized.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ==========================================
          SCREEN 5: REPORT FORM (Public Submission)
          ========================================== -->
     <section id="screen-report-form" class="view-section">
@@ -321,6 +381,14 @@
           2-Factor Hacker-Proof Access. Please enter the Security Admin PIN to proceed.
         </p>
 
+        <!-- Google OAuth Button Option -->
+        <div style="margin-bottom: 1.5rem;">
+          <button type="button" class="btn-back" style="width: 100%; border: 1px solid var(--border-color); justify-content: center; padding: 0.75rem;" onclick="app.loginWithGoogle()">
+            <i class="fa-brands fa-google" style="color: #4285F4;"></i> Sign in with Google (Admin)
+          </button>
+          <div style="margin: 0.8rem 0; font-size: 0.8rem; color: var(--text-muted); text-align: center;">— OR USE SECURITY PIN —</div>
+        </div>
+
         <form onsubmit="app.verifyAdminPin(event)">
           <label style="font-weight: 600; font-size: 0.9rem;">4-Digit Security PIN</label>
           <div class="pin-input-group">
@@ -362,9 +430,15 @@
       <div id="tab-manage" class="admin-tab-content active">
         <div class="admin-action-bar">
           <h3 style="font-size: 1.2rem;">All Campus Animals & Birds</h3>
-          <button class="btn-cta" style="padding: 0.6rem 1.2rem; font-size: 0.92rem;" onclick="app.openAddAnimalModal()">
-            <i class="fa-solid fa-plus"></i> Add New Animal / Bird
-          </button>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <button class="btn-cta" style="padding: 0.6rem 1.2rem; font-size: 0.92rem;" onclick="app.openAddAnimalModal()">
+              <i class="fa-solid fa-plus"></i> Add New Profile
+            </button>
+            <button class="btn-back" style="border: 1px solid var(--border-color);" onclick="document.getElementById('excel-import-file').click()">
+              <i class="fa-solid fa-file-excel" style="color: #1D6F42;"></i> Batch Import Excel/CSV
+            </button>
+            <input type="file" id="excel-import-file" accept=".csv, .xlsx" style="display: none;" onchange="app.handleExcelImport(event)">
+          </div>
         </div>
 
         <div class="table-responsive">
@@ -427,7 +501,7 @@
             <hr class="full-width" style="border: 0; border-top: 1px solid var(--border-color); margin: 1rem 0;">
 
             <div class="form-group full-width">
-              <label for="setting-supabase-url">Supabase Project URL (Optional Cloud Database)</label>
+              <label for="setting-supabase-url">Supabase Project URL (Cloud Database & Storage)</label>
               <input type="text" id="setting-supabase-url" placeholder="https://your-project.supabase.co">
             </div>
 
@@ -458,6 +532,53 @@
     </section>
 
   </main>
+
+  <!-- ==========================================
+       MODAL: JOIN OUR CAUSE
+       ========================================== -->
+  <div class="modal-overlay" id="join-cause-modal">
+    <div class="modal-content">
+      <button class="modal-close-btn" onclick="app.closeModal('join-cause-modal')">&times;</button>
+      <div style="text-align: center; margin-bottom: 1.5rem;">
+        <i class="fa-solid fa-hand-holding-heart" style="font-size: 2.5rem; color: var(--primary);"></i>
+        <h3 style="margin-top: 0.5rem;">Join the Cause — AWC IIT Ropar</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">Choose how you would like to participate or support our animal welfare initiatives</p>
+      </div>
+
+      <div class="join-options-grid">
+        <!-- Option 1: Volunteer -->
+        <div class="join-option-card">
+          <div class="join-icon"><i class="fa-solid fa-user-graduate"></i></div>
+          <h4>1. Volunteer with Us</h4>
+          <p>Join our student volunteer network to help in feeding drives, rescue operations, and awareness campaigns.</p>
+          <a href="mailto:awc@iitrpr.ac.in?subject=Volunteer%20Application%20for%20AWC%20IIT%20Ropar" class="btn-cta" style="padding: 0.5rem 1rem; font-size: 0.88rem; width: 100%; justify-content: center;">
+            <i class="fa-solid fa-envelope"></i> Email awc@iitrpr.ac.in
+          </a>
+        </div>
+
+        <!-- Option 2: Observer WhatsApp -->
+        <div class="join-option-card">
+          <div class="join-icon" style="background: rgba(37, 211, 102, 0.15); color: #25D366;"><i class="fa-brands fa-whatsapp"></i></div>
+          <h4>2. Join as an Observer</h4>
+          <p>Stay updated on campus animal updates, sightings, and community discussions via our WhatsApp Group.</p>
+          <a href="https://chat.whatsapp.com/YOUR_AWC_WHATSAPP_GROUP_LINK" target="_blank" class="btn-cta" style="background: #25D366; padding: 0.5rem 1rem; font-size: 0.88rem; width: 100%; justify-content: center;">
+            <i class="fa-brands fa-whatsapp"></i> Join WhatsApp Group
+          </a>
+        </div>
+
+        <!-- Option 3: Support / Donate -->
+        <div class="join-option-card full-width">
+          <div class="join-icon" style="background: var(--secondary-light); color: var(--secondary);"><i class="fa-solid fa-heart"></i></div>
+          <h4>3. Donate for Animal Care</h4>
+          <p>Your generous contribution helps fund vaccinations, medical treatments, feeding bowls, and emergency shelter care.</p>
+          <div class="upi-box">
+            <span><strong>UPI ID:</strong> awc@iitrpr (Official AWC Account)</span>
+            <div style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted);">Scan QR Code or copy UPI ID to donate</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- ==========================================
        MODAL: ADD / EDIT ANIMAL (ADMIN)
@@ -547,12 +668,22 @@
     </div>
   </div>
 
-  <!-- APP FOOTER -->
+  <!-- APP FOOTER WITH SOCIAL LINKS -->
   <footer class="app-footer">
     <div class="footer-quote">"वसुधैव कुटुम्बकम्"</div>
     <p>Official Portal of Animal Welfare Committee (AWC), IIT Ropar</p>
-    <p style="font-size: 0.78rem; margin-top: 0.5rem; color: var(--text-muted);">
-      Crafted for better cause • Hosted free on GitHub Pages • Admin Secured
+    
+    <!-- Social Handles Bar -->
+    <div class="social-links-bar">
+      <a href="https://instagram.com" target="_blank" class="social-icon" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+      <a href="https://chat.whatsapp.com/YOUR_AWC_WHATSAPP_GROUP_LINK" target="_blank" class="social-icon" title="WhatsApp Group"><i class="fa-brands fa-whatsapp"></i></a>
+      <a href="mailto:awc@iitrpr.ac.in" class="social-icon" title="Official Email"><i class="fa-solid fa-envelope"></i></a>
+      <a href="https://linkedin.com" target="_blank" class="social-icon" title="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
+      <a href="https://youtube.com" target="_blank" class="social-icon" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+    </div>
+
+    <p style="font-size: 0.78rem; margin-top: 0.8rem; color: var(--text-muted);">
+      Crafted for better cause • Hosted free • Admin Secured
     </p>
   </footer>
 

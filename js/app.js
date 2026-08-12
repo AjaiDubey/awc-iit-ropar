@@ -1,7 +1,7 @@
 /* ==========================================================================
    AWC IIT ROPAR — Main Application JavaScript
    Handles Navigation, Data Rendering, Search & Filters, Form Submissions,
-   Admin Authentication (Password + Security PIN), CRUD Operations & Storage
+   Admin Authentication (Password + Security PIN), CSV/Excel Import, WhatsApp Updates
    ========================================================================== */
 
 const app = {
@@ -123,6 +123,10 @@ const app = {
       const isVax = item.vaccination_status && item.vaccination_status.toLowerCase().includes('vac');
       const photoSrc = item.photo_url || (this.currentCategory === 'bird' ? 'images/bird-card.jpg' : this.currentCategory === 'cat' ? 'images/cat-card.jpg' : 'images/dog-card.jpg');
 
+      // WhatsApp Redirect URL pre-filled message
+      const waText = encodeURIComponent(`Hi AWC Team! I want to share an update regarding ${item.name} (${item.species || item.type}) residing near ${item.permanent_location || 'campus'}.`);
+      const waUrl = `https://wa.me/?text=${waText}`;
+
       const cardHTML = `
         <div class="animal-card">
           <div class="animal-card-header">
@@ -159,6 +163,10 @@ const app = {
                 <strong>Speciality:</strong> ${item.speciality}
               </div>
             ` : ''}
+
+            <a href="${waUrl}" target="_blank" class="btn-whatsapp-update" title="Send update on WhatsApp">
+              <i class="fa-brands fa-whatsapp"></i> Want to update info about ${item.name}?
+            </a>
           </div>
         </div>
       `;
@@ -201,7 +209,7 @@ const app = {
     this.showScreen('screen-report-form');
   },
 
-  // File Upload Helper (converts image file to data URL for local storage / Supabase)
+  // File Upload Helper
   handleFileSelect: function(event, previewId, hiddenInputId) {
     const file = event.target.files[0];
     if (!file) return;
@@ -291,6 +299,17 @@ const app = {
     }
   },
 
+  loginWithGoogle: function() {
+    if (supabaseClient) {
+      supabaseClient.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: window.location.href }
+      });
+    } else {
+      this.showToast('Please configure Supabase URL & Key in settings first for Google Auth.', 'info');
+    }
+  },
+
   // Admin Dashboard Render & Tabs
   loadAdminDashboard: async function() {
     const allData = await DataStore.fetchAllForAdmin();
@@ -351,6 +370,46 @@ const app = {
 
     document.getElementById(tabId).style.display = 'block';
     event.currentTarget.classList.add('active');
+  },
+
+  // Batch Excel / CSV Import
+  handleExcelImport: function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const text = e.target.result;
+      const lines = text.split('\n');
+      let addedCount = 0;
+
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+        const cols = line.split(',');
+        if (cols.length >= 3) {
+          const item = {
+            id: 'import-' + Date.now() + '-' + i,
+            type: (cols[0] || 'dog').trim().toLowerCase(),
+            name: (cols[1] || 'Unnamed').trim(),
+            species: (cols[2] || '').trim(),
+            approx_age: (cols[3] || '').trim(),
+            permanent_location: (cols[4] || 'Campus').trim(),
+            avg_behavior: (cols[5] || 'Friendly').trim(),
+            vaccination_status: (cols[6] || 'Vaccinated (Up-to-date)').trim(),
+            sterilization_status: (cols[7] || 'Sterilized').trim(),
+            speciality: (cols[8] || '').trim(),
+            photo_url: (cols[9] || '').trim(),
+            is_approved: true
+          };
+          await DataStore.saveAnimal(item);
+          addedCount++;
+        }
+      }
+      this.showToast(`Successfully imported ${addedCount} records from file!`, 'success');
+      this.loadAdminDashboard();
+    };
+    reader.readAsText(file);
   },
 
   // CRUD Actions
