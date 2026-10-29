@@ -1298,7 +1298,7 @@
 
       <div class="input-group">
         <label class="input-label">Google Apps Script Web App URL</label>
-        <input type="url" id="settings-gas-url" class="text-input" placeholder="https://script.google.com/macros/s/.../exec">
+        <input type="url" id="settings-gas-url" class="text-input" value="https://script.google.com/macros/s/AKfycbw-A2jsNZA9CJ-UdS-2h_uIgQouptiic24vFnVysT8AZK1yxrSLb1BtrIQAHA6QSJE/exec">
       </div>
 
       <div class="input-group">
@@ -1416,7 +1416,7 @@
         xp: 0,
         spots: 0
       },
-      gasUrl: '',
+      gasUrl: 'https://script.google.com/macros/s/AKfycbw-A2jsNZA9CJ-UdS-2h_uIgQouptiic24vFnVysT8AZK1yxrSLb1BtrIQAHA6QSJE/exec',
       timerEndTime: null,
       timerInterval: null,
       leaderboardData: [],
@@ -1444,9 +1444,9 @@
         const url = localStorage.getItem('pawspotter_gas_url');
         if (url) {
           this.gasUrl = url;
-          const input = document.getElementById('settings-gas-url');
-          if (input) input.value = url;
         }
+        const input = document.getElementById('settings-gas-url');
+        if (input) input.value = this.gasUrl;
       },
 
       // 3-HOUR COUNTDOWN TIMER LOGIC
