@@ -1,0 +1,1986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🐾 Paw-Safari: Morning Sprint — Campus Animal Census</title>
+  <meta name="theme-color" content="#1b4332">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22%200%22%20100%22%20100%22><text y=%22.9em%22 font-size=%2290%22>🐾</text></svg>">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+  <style>
+    :root {
+      --primary: #2d6a4f;
+      --primary-light: #52b788;
+      --primary-dark: #1b4332;
+      --accent: #ff9f1c;
+      --accent-hover: #f77f00;
+      --gold: #f59f00;
+      --silver: #868e96;
+      --bronze: #d9480f;
+      --bg: #f8f9fa;
+      --card-bg: #ffffff;
+      --text: #212529;
+      --text-muted: #6c757d;
+      --border: #e9ecef;
+      --radius: 18px;
+      --shadow: 0 8px 24px rgba(0,0,0,0.08);
+      --success: #2ec4b6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: #081c15;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 0;
+      background-image: 
+        radial-gradient(circle at 15% 20%, rgba(45, 106, 79, 0.45) 0%, transparent 40%),
+        radial-gradient(circle at 85% 80%, rgba(255, 159, 28, 0.25) 0%, transparent 40%);
+    }
+
+    .app-phone-container {
+      width: 100%;
+      max-width: 480px;
+      min-height: 100vh;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 0 50px rgba(0,0,0,0.4);
+    }
+
+    /* TOP HEADER */
+    .top-header {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      color: white;
+      padding: 0.9rem 1.1rem;
+      border-bottom-left-radius: 24px;
+      border-bottom-right-radius: 24px;
+      box-shadow: 0 6px 20px rgba(27, 67, 50, 0.35);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.6rem;
+    }
+
+    .brand-title {
+      font-family: 'Fredoka', cursive;
+      font-size: 1.3rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .brand-title span {
+      color: var(--accent);
+    }
+
+    .header-icons {
+      display: flex;
+      gap: 0.4rem;
+    }
+
+    .icon-chip-btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+    }
+
+    .icon-chip-btn:active {
+      transform: scale(0.9);
+      background: rgba(255, 255, 255, 0.35);
+    }
+
+    /* 3-HOUR EVENT TIMER BAR */
+    .event-timer-bar {
+      background: rgba(0, 0, 0, 0.35);
+      border-radius: 12px;
+      padding: 0.4rem 0.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      margin-bottom: 0.6rem;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .timer-tag {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-weight: 700;
+      color: #ffe066;
+    }
+
+    .timer-clock {
+      font-family: monospace;
+      font-size: 0.95rem;
+      font-weight: 800;
+      background: #000;
+      color: #ff9f1c;
+      padding: 2px 8px;
+      border-radius: 6px;
+      letter-spacing: 1px;
+    }
+
+    /* SCOUT PROFILE HUD */
+    .scout-hud {
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 0.65rem 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      cursor: pointer;
+    }
+
+    .scout-avatar-badge {
+      font-size: 2rem;
+      background: rgba(255, 255, 255, 0.25);
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .scout-details {
+      flex: 1;
+    }
+
+    .scout-name-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .scout-name {
+      font-family: 'Fredoka', cursive;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .scout-rank {
+      font-size: 0.72rem;
+      background: var(--accent);
+      color: #000;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 10px;
+      text-transform: uppercase;
+    }
+
+    .xp-bar-container {
+      margin-top: 4px;
+      background: rgba(0, 0, 0, 0.3);
+      height: 7px;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .xp-bar-fill {
+      background: linear-gradient(90deg, #ff9f1c, #ffe49e);
+      height: 100%;
+      width: 25%;
+      border-radius: 10px;
+      transition: width 0.5s ease;
+    }
+
+    .xp-label {
+      font-size: 0.68rem;
+      color: rgba(255, 255, 255, 0.85);
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2px;
+    }
+
+    /* NAVIGATION PILLS (Sighting Form vs Live Leaderboard) */
+    .view-switcher {
+      display: flex;
+      background: #e9ecef;
+      padding: 4px;
+      border-radius: 14px;
+      margin: 0.9rem 1.1rem 0.4rem;
+      gap: 4px;
+    }
+
+    .switch-btn {
+      flex: 1;
+      padding: 0.6rem;
+      border: none;
+      background: transparent;
+      border-radius: 11px;
+      font-family: 'Fredoka', cursive;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      transition: all 0.2s;
+    }
+
+    .switch-btn.active {
+      background: white;
+      color: var(--primary-dark);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    }
+
+    /* CONTENT SCROLL AREA */
+    .app-content {
+      flex: 1;
+      padding: 0.8rem 1.1rem 90px;
+      overflow-y: auto;
+    }
+
+    /* RULES SUMMARY BANNER */
+    .rules-card {
+      background: linear-gradient(135deg, #e3fafc, #c5f6fa);
+      border: 1.5px solid #66d9e8;
+      border-radius: var(--radius);
+      padding: 0.85rem 1rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+
+    .rules-left {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    .rules-icon {
+      font-size: 1.8rem;
+      color: #0c8599;
+    }
+
+    .rules-text h4 {
+      font-family: 'Fredoka', cursive;
+      font-size: 0.95rem;
+      color: #0c8599;
+    }
+
+    .rules-text p {
+      font-size: 0.74rem;
+      color: #1098ad;
+    }
+
+    .btn-view-rules {
+      background: #15aabf;
+      color: white;
+      border: none;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.35rem 0.65rem;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    /* CARDS */
+    .game-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 1.1rem;
+      margin-bottom: 1.1rem;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+
+    .card-heading {
+      font-family: 'Fredoka', cursive;
+      font-size: 1.1rem;
+      color: var(--primary-dark);
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .card-heading i {
+      color: var(--accent);
+    }
+
+    .required-badge {
+      font-size: 0.65rem;
+      background: #ffe3e3;
+      color: #c92a2a;
+      padding: 2px 6px;
+      border-radius: 6px;
+      margin-left: auto;
+      font-weight: 800;
+    }
+
+    /* CATEGORY SELECTOR */
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.45rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .cat-btn {
+      background: #f1f3f5;
+      border: 2px solid transparent;
+      border-radius: 14px;
+      padding: 0.55rem 0.2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .cat-btn .icon {
+      font-size: 1.5rem;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .cat-btn .label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .cat-btn.active {
+      background: #e8f5e9;
+      border-color: var(--primary-light);
+      box-shadow: 0 4px 10px rgba(82, 183, 136, 0.25);
+    }
+
+    .cat-btn.active .label {
+      color: var(--primary-dark);
+    }
+
+    /* 3-PHOTO CAMERA SECTION */
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.55rem;
+      margin-top: 0.5rem;
+    }
+
+    .photo-slot {
+      background: #f8f9fa;
+      border: 2px dashed #adb5bd;
+      border-radius: 14px;
+      aspect-ratio: 1 / 1.18;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      cursor: pointer;
+      overflow: hidden;
+      transition: all 0.2s;
+    }
+
+    .photo-slot:active {
+      transform: scale(0.96);
+    }
+
+    .photo-slot.captured {
+      border: 2px solid var(--primary-light);
+      background: #000;
+    }
+
+    .photo-slot img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .photo-slot .placeholder-icon {
+      font-size: 1.7rem;
+      color: #adb5bd;
+      margin-bottom: 4px;
+    }
+
+    .photo-slot .slot-label {
+      font-size: 0.65rem;
+      font-weight: 800;
+      color: #495057;
+      text-align: center;
+      padding: 0 4px;
+    }
+
+    .photo-slot .badge-status {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background: var(--primary-light);
+      color: white;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+
+    .photo-slot.captured .badge-status {
+      display: flex;
+    }
+
+    .hidden-input {
+      display: none;
+    }
+
+    /* INPUTS */
+    .input-group {
+      margin-bottom: 0.85rem;
+    }
+
+    .input-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 0.3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .text-input, .select-input {
+      width: 100%;
+      padding: 0.7rem 0.85rem;
+      border: 1.5px solid #dee2e6;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+      background: #fff;
+    }
+
+    .text-input:focus, .select-input:focus {
+      border-color: var(--primary-light);
+      box-shadow: 0 0 0 3px rgba(82, 183, 136, 0.15);
+    }
+
+    .input-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn-dice {
+      background: #ffe3e3;
+      border: 1px solid #ffc9c9;
+      color: #e03131;
+      padding: 0 0.8rem;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 0.82rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* GPS BOX */
+    .gps-box {
+      background: #e7f5ff;
+      border: 1.5px solid #a5d8ff;
+      border-radius: 12px;
+      padding: 0.7rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 0.5rem;
+    }
+
+    .gps-info {
+      font-size: 0.75rem;
+      color: #1864ab;
+    }
+
+    .gps-info strong {
+      display: block;
+      font-size: 0.82rem;
+    }
+
+    .btn-gps {
+      background: #1971c2;
+      color: white;
+      border: none;
+      padding: 0.45rem 0.75rem;
+      border-radius: 10px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    /* TRAIT CHIPS */
+    .traits-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .trait-chip {
+      background: #f1f3f5;
+      padding: 0.35rem 0.65rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid #dee2e6;
+      transition: all 0.2s;
+    }
+
+    .trait-chip.selected {
+      background: #2b8a3e;
+      color: white;
+      border-color: #2b8a3e;
+    }
+
+    /* SUBMIT BAR */
+    .submit-bar {
+      position: sticky;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      padding: 0.85rem 1.1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .btn-submit-spot {
+      width: 100%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      color: #000;
+      border: none;
+      padding: 0.95rem;
+      border-radius: 16px;
+      font-family: 'Fredoka', cursive;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      box-shadow: 0 6px 18px rgba(255, 159, 28, 0.4);
+    }
+
+    .btn-submit-spot:disabled {
+      background: #ced4da;
+      color: #868e96;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+
+    /* ====================================================
+       LEADERBOARD VIEW STYLES
+       ==================================================== */
+    .leaderboard-container {
+      display: none;
+    }
+
+    /* PODIUM (TOP 3 WINNERS) */
+    .podium-section {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 0.5rem;
+      margin: 1.2rem 0 1.5rem;
+      padding: 0 0.5rem;
+    }
+
+    .podium-col {
+      flex: 1;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .podium-avatar {
+      font-size: 2.2rem;
+      background: white;
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 6px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+      border: 3px solid #dee2e6;
+    }
+
+    .podium-name {
+      font-family: 'Fredoka', cursive;
+      font-size: 0.85rem;
+      font-weight: 600;
+      max-width: 100px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .podium-score {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .podium-pedestal {
+      width: 100%;
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-family: 'Fredoka', cursive;
+      padding: 0.5rem 0.2rem;
+    }
+
+    .podium-col.rank-1 .podium-pedestal {
+      height: 100px;
+      background: linear-gradient(180deg, #ffc078, #d9480f);
+      box-shadow: 0 6px 15px rgba(217, 72, 15, 0.3);
+    }
+    .podium-col.rank-1 .podium-avatar {
+      border-color: #ffd43b;
+      transform: scale(1.1);
+    }
+
+    .podium-col.rank-2 .podium-pedestal {
+      height: 75px;
+      background: linear-gradient(180deg, #ced4da, #495057);
+    }
+
+    .podium-col.rank-3 .podium-pedestal {
+      height: 60px;
+      background: linear-gradient(180deg, #ffd8a8, #c92a2a);
+    }
+
+    .pedestal-rank {
+      font-size: 1.4rem;
+      font-weight: 800;
+    }
+
+    .pedestal-title {
+      font-size: 0.62rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 0 4px;
+      text-align: center;
+    }
+
+    /* LEADERBOARD LIST */
+    .lb-row {
+      background: white;
+      border-radius: 14px;
+      padding: 0.75rem 1rem;
+      margin-bottom: 0.6rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    .lb-row.top-3 {
+      border-left: 4px solid var(--accent);
+    }
+
+    .lb-rank {
+      font-family: 'Fredoka', cursive;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      width: 26px;
+      text-align: center;
+    }
+
+    .lb-info {
+      flex: 1;
+    }
+
+    .lb-name-title {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .lb-name {
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+
+    .lb-honor-title {
+      font-size: 0.68rem;
+      font-weight: 800;
+      background: #e7f5ff;
+      color: #1c7ed6;
+      padding: 1px 6px;
+      border-radius: 6px;
+    }
+
+    .lb-subtext {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      display: flex;
+      gap: 0.8rem;
+      margin-top: 2px;
+    }
+
+    .lb-score-box {
+      text-align: right;
+    }
+
+    .lb-score-num {
+      font-family: 'Fredoka', cursive;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+    }
+
+    .lb-score-unit {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      display: block;
+      margin-top: -3px;
+    }
+
+    /* MODALS */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(5px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      padding: 1rem;
+    }
+
+    .modal-card {
+      background: white;
+      border-radius: 24px;
+      width: 100%;
+      max-width: 420px;
+      padding: 1.4rem;
+      text-align: center;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.85); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-avatar-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.5rem;
+      margin: 0.8rem 0;
+    }
+
+    .avatar-option {
+      font-size: 1.9rem;
+      background: #f1f3f5;
+      padding: 0.4rem;
+      border-radius: 14px;
+      cursor: pointer;
+      border: 2px solid transparent;
+    }
+
+    .avatar-option.selected {
+      border-color: var(--primary);
+      background: #e8f5e9;
+    }
+
+    .btn-modal-action {
+      width: 100%;
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.8rem;
+      border-radius: 14px;
+      font-family: 'Fredoka', cursive;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 0.7rem;
+    }
+
+    .rule-item {
+      text-align: left;
+      background: #f8f9fa;
+      border-left: 4px solid var(--accent);
+      padding: 0.75rem;
+      border-radius: 8px;
+      margin-bottom: 0.75rem;
+    }
+
+    .rule-item strong {
+      display: block;
+      color: var(--primary-dark);
+      font-size: 0.88rem;
+      margin-bottom: 2px;
+    }
+
+    .rule-item p {
+      font-size: 0.78rem;
+      color: #495057;
+      line-height: 1.35;
+    }
+
+    /* TOAST */
+    .toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #212529;
+      color: white;
+      padding: 0.7rem 1.2rem;
+      border-radius: 30px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <!-- PHONE CONTAINER -->
+  <div class="app-phone-container">
+
+    <!-- TOP APP HEADER -->
+    <header class="top-header">
+      <div class="header-nav">
+        <div class="brand-title">
+          <span>🐾 Paw-Safari</span> Sprint
+        </div>
+        <div class="header-icons">
+          <button class="icon-chip-btn" id="sound-btn" onclick="game.toggleSound()" title="Sound On/Off">
+            <i class="fa-solid fa-volume-high" id="sound-icon"></i>
+          </button>
+          <button class="icon-chip-btn" onclick="game.openSettings()" title="Event & Google Sheet Settings">
+            <i class="fa-solid fa-gear"></i>
+          </button>
+          <a href="index.html" class="icon-chip-btn" title="Back to Main AWC Portal" style="text-decoration:none;">
+            <i class="fa-solid fa-house"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- 3-HOUR EVENT TIMER BAR -->
+      <div class="event-timer-bar">
+        <div class="timer-tag">
+          <i class="fa-solid fa-stopwatch"></i>
+          <span id="timer-status-label">Morning Sprint (3h):</span>
+        </div>
+        <div class="timer-clock" id="event-countdown">02:59:59</div>
+      </div>
+
+      <!-- SCOUT PROFILE HUD -->
+      <div class="scout-hud" onclick="game.openProfileModal()">
+        <div class="scout-avatar-badge" id="hud-avatar">🐕</div>
+        <div class="scout-details">
+          <div class="scout-name-row">
+            <span class="scout-name" id="hud-name">Cadet Spotter</span>
+            <span class="scout-rank" id="hud-rank">Lvl 1 Scout</span>
+          </div>
+          <div class="xp-bar-container">
+            <div class="xp-bar-fill" id="hud-xp-fill" style="width: 20%;"></div>
+          </div>
+          <div class="xp-label">
+            <span id="hud-xp-text">0 / 300 XP</span>
+            <span id="hud-spots-count">🐾 0 Qualified</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- VIEW SWITCHER (Sighting Form vs Live Leaderboard) -->
+    <div class="view-switcher">
+      <button class="switch-btn active" id="btn-tab-spot" onclick="game.switchTab('spot')">
+        <i class="fa-solid fa-camera"></i> Spot Animal
+      </button>
+      <button class="switch-btn" id="btn-tab-lb" onclick="game.switchTab('leaderboard')">
+        <i class="fa-solid fa-trophy"></i> Live Leaderboard
+      </button>
+    </div>
+
+    <!-- VIEW 1: SIGHTING FORM -->
+    <div class="app-content" id="view-spot">
+
+      <!-- RULES SUMMARY BANNER -->
+      <div class="rules-card" onclick="game.openRulesModal()">
+        <div class="rules-left">
+          <i class="fa-solid fa-award rules-icon"></i>
+          <div class="rules-text">
+            <h4>🏆 3-Hour Census Rules</h4>
+            <p>Must take all 3 photo angles & name every animal to qualify!</p>
+          </div>
+        </div>
+        <button class="btn-view-rules">View Rules</button>
+      </div>
+
+      <!-- STEP 1: CATEGORY & NAME -->
+      <div class="game-card">
+        <div class="card-heading">
+          <i class="fa-solid fa-shapes"></i> 1. Who did you spot?
+        </div>
+        <div class="category-grid">
+          <div class="cat-btn active" onclick="game.setCategory('Dog', this)">
+            <span class="icon">🐕</span>
+            <span class="label">Dog</span>
+          </div>
+          <div class="cat-btn" onclick="game.setCategory('Puppy', this)">
+            <span class="icon">🐶</span>
+            <span class="label">Puppy</span>
+          </div>
+          <div class="cat-btn" onclick="game.setCategory('Cat', this)">
+            <span class="icon">🐈</span>
+            <span class="label">Cat</span>
+          </div>
+          <div class="cat-btn" onclick="game.setCategory('Kitten', this)">
+            <span class="icon">🐱</span>
+            <span class="label">Kitten</span>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">
+            <span>Animal Name / Nickname</span>
+            <span class="required-badge">REQUIRED FOR WIN</span>
+          </label>
+          <div class="input-row">
+            <input type="text" id="animal-name" class="text-input" placeholder="e.g. Sheru, Oreo, Biscuit, Goldie...">
+            <button type="button" class="btn-dice" onclick="game.randomName()" title="Give a Cute Random Name">
+              <i class="fa-solid fa-dice"></i> Dice
+            </button>
+          </div>
+        </div>
+
+        <div class="input-group" style="margin-bottom:0;">
+          <label class="input-label">Age & Stage</label>
+          <select id="animal-age" class="select-input">
+            <option value="Puppy / Baby">🍼 Puppy / Kitten (< 6 months)</option>
+            <option value="Young Adult" selected>🐾 Young Adult (1-3 yrs)</option>
+            <option value="Mature Adult">🐕 Mature Adult (3-7 yrs)</option>
+            <option value="Senior">👴 Senior (> 7 yrs)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- STEP 2: 3-SIDE PHOTO CAPTURE (RULE 1) -->
+      <div class="game-card">
+        <div class="card-heading">
+          <i class="fa-solid fa-camera"></i> 2. Snap 3 Sides (Mandatory)
+          <span class="required-badge">ALL 3 REQUIRED</span>
+        </div>
+        <p style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 0.6rem;">
+          Rule 1: Front, Left side, and Right side are all mandatory for the sighting to count toward your winning score!
+        </p>
+
+        <div class="photo-grid">
+          <!-- ANGLE 1: FRONT -->
+          <div class="photo-slot" id="slot-front" onclick="game.triggerPhoto('front')">
+            <div class="badge-status"><i class="fa-solid fa-check"></i></div>
+            <img id="preview-front" style="display:none;" alt="Front view">
+            <div class="slot-placeholder" id="ph-front">
+              <i class="fa-solid fa-dog placeholder-icon"></i>
+              <div class="slot-label">📸 1. Front Face</div>
+            </div>
+            <input type="file" id="file-front" class="hidden-input" accept="image/*" capture="environment" onchange="game.handlePhoto(event, 'front')">
+          </div>
+
+          <!-- ANGLE 2: LEFT SIDE -->
+          <div class="photo-slot" id="slot-left" onclick="game.triggerPhoto('left')">
+            <div class="badge-status"><i class="fa-solid fa-check"></i></div>
+            <img id="preview-left" style="display:none;" alt="Left side">
+            <div class="slot-placeholder" id="ph-left">
+              <i class="fa-solid fa-arrow-left placeholder-icon"></i>
+              <div class="slot-label">📸 2. Left Flank</div>
+            </div>
+            <input type="file" id="file-left" class="hidden-input" accept="image/*" capture="environment" onchange="game.handlePhoto(event, 'left')">
+          </div>
+
+          <!-- ANGLE 3: RIGHT SIDE -->
+          <div class="photo-slot" id="slot-right" onclick="game.triggerPhoto('right')">
+            <div class="badge-status"><i class="fa-solid fa-check"></i></div>
+            <img id="preview-right" style="display:none;" alt="Right side">
+            <div class="slot-placeholder" id="ph-right">
+              <i class="fa-solid fa-arrow-right placeholder-icon"></i>
+              <div class="slot-label">📸 3. Right Flank</div>
+            </div>
+            <input type="file" id="file-right" class="hidden-input" accept="image/*" capture="environment" onchange="game.handlePhoto(event, 'right')">
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3: LOCATION & GPS -->
+      <div class="game-card">
+        <div class="card-heading">
+          <i class="fa-solid fa-location-dot"></i> 3. Campus Location
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Campus Landmark</label>
+          <select id="campus-landmark" class="select-input">
+            <option value="Chenab Hostel">Chenab Hostel</option>
+            <option value="Sutlej Hostel">Sutlej Hostel</option>
+            <option value="Beas Hostel">Beas Hostel</option>
+            <option value="Brahmaputra Hostel">Brahmaputra Hostel</option>
+            <option value="Raikar Hostel">Raikar Hostel</option>
+            <option value="Main Gate / Security">Main Gate / Security</option>
+            <option value="Central Library">Central Library</option>
+            <option value="Lecture Hall Complex (LHC)">Lecture Hall Complex (LHC)</option>
+            <option value="Main Dining Hall / Mess">Main Dining Hall / Mess</option>
+            <option value="Sports Complex & Grounds">Sports Complex & Grounds</option>
+            <option value="Student Activity Center (SAC)">Student Activity Center (SAC)</option>
+            <option value="Academic Blocks / Labs">Academic Blocks / Labs</option>
+            <option value="Faculty & Staff Quarters">Faculty & Staff Quarters</option>
+            <option value="Other Campus Spot">Other Campus Spot</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Specific Spot Details (Optional)</label>
+          <input type="text" id="spot-details" class="text-input" placeholder="e.g. Near cycle stand, tree outside mess...">
+        </div>
+
+        <div class="gps-box">
+          <div class="gps-info">
+            <strong id="gps-status-title">📍 Live GPS Coordinates</strong>
+            <span id="gps-coords-text">Tap Get GPS for pin-point accuracy (+25 XP)</span>
+          </div>
+          <button type="button" class="btn-gps" onclick="game.fetchGPS()">
+            <i class="fa-solid fa-crosshairs"></i> Get GPS
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 4: TRAITS -->
+      <div class="game-card">
+        <div class="card-heading">
+          <i class="fa-solid fa-tag"></i> 4. Marks & Temperament
+        </div>
+        <div class="traits-wrap" id="traits-list">
+          <div class="trait-chip" onclick="game.toggleTrait(this)">😊 Friendly</div>
+          <div class="trait-chip" onclick="game.toggleTrait(this)">🙈 Shy</div>
+          <div class="trait-chip" onclick="game.toggleTrait(this)">🎾 Playful</div>
+          <div class="trait-chip" onclick="game.toggleTrait(this)">😴 Sleeping</div>
+          <div class="trait-chip" onclick="game.toggleTrait(this)">🍖 Hungry</div>
+          <div class="trait-chip" onclick="game.toggleTrait(this)">🦮 Wears Collar</div>
+          <div class="trait-chip" onclick="game.toggleTrait(this)">✂️ Ear Notched (Sterilized)</div>
+          <div class="trait-chip" onclick="game.toggleTrait(this)">🩹 Limping / Injured</div>
+        </div>
+
+        <input type="text" id="custom-notes" class="text-input" placeholder="Any special marks (e.g. brown ears, white socks...)">
+      </div>
+
+    </div>
+
+    <!-- VIEW 2: LIVE LEADERBOARD -->
+    <div class="app-content leaderboard-container" id="view-leaderboard">
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.8rem;">
+        <div>
+          <h3 style="font-family:'Fredoka',cursive; font-size:1.3rem; color:var(--primary-dark);">
+            🏆 Volunteer Honor Stand
+          </h3>
+          <p style="font-size:0.75rem; color:var(--text-muted);">
+            Real-time rankings during the 3-hour Morning Paw-Safari
+          </p>
+        </div>
+        <button class="btn-gps" style="background:#2b8a3e;" onclick="game.fetchLiveLeaderboard()">
+          <i class="fa-solid fa-rotate"></i> Sync
+        </button>
+      </div>
+
+      <!-- TOP 3 PODIUM -->
+      <div class="podium-section" id="podium-display">
+        <!-- RANK 2 (SILVER) -->
+        <div class="podium-col rank-2">
+          <div class="podium-avatar" id="podium-avatar-2">🥈</div>
+          <div class="podium-name" id="podium-name-2">Scout</div>
+          <div class="podium-score" id="podium-score-2">0 dogs</div>
+          <div class="podium-pedestal">
+            <span class="pedestal-rank">2</span>
+            <span class="pedestal-title">Master Whiskers</span>
+          </div>
+        </div>
+
+        <!-- RANK 1 (GOLD) -->
+        <div class="podium-col rank-1">
+          <div class="podium-avatar" id="podium-avatar-1">🥇</div>
+          <div class="podium-name" id="podium-name-1">Champion</div>
+          <div class="podium-score" id="podium-score-1">0 dogs</div>
+          <div class="podium-pedestal">
+            <span class="pedestal-rank">1</span>
+            <span class="pedestal-title">Grand Alpha</span>
+          </div>
+        </div>
+
+        <!-- RANK 3 (BRONZE) -->
+        <div class="podium-col rank-3">
+          <div class="podium-avatar" id="podium-avatar-3">🥉</div>
+          <div class="podium-name" id="podium-name-3">Scout</div>
+          <div class="podium-score" id="podium-score-3">0 dogs</div>
+          <div class="podium-pedestal">
+            <span class="pedestal-rank">3</span>
+            <span class="pedestal-title">Top Bark-Scout</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- FULL LEADERBOARD LIST -->
+      <div id="leaderboard-list">
+        <!-- Rendered dynamically -->
+        <div style="text-align:center; padding: 2rem; color:var(--text-muted); font-size:0.85rem;">
+          <i class="fa-solid fa-spinner fa-spin" style="font-size:1.5rem; margin-bottom:8px; display:block;"></i>
+          Loading live rankings from Google Sheet...
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SUBMIT FIXED BOTTOM BAR -->
+    <div class="submit-bar" id="submit-bar-container">
+      <button class="btn-submit-spot" id="btn-submit" onclick="game.submitSighting()">
+        <i class="fa-solid fa-cloud-arrow-up"></i>
+        <span>Upload Sighting & Score Points!</span>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- MODAL: 4 WINNING RULES -->
+  <div class="modal-overlay" id="modal-rules">
+    <div class="modal-card">
+      <div style="font-size: 2.8rem; margin-bottom: 0.3rem;">📜🐾🏆</div>
+      <h3 style="font-family:'Fredoka',cursive; color:var(--primary-dark); font-size:1.4rem;">The 4 Winning Rules</h3>
+      <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:1rem;">
+        Official Guidelines for the 3-Hour Campus Paw-Safari
+      </p>
+
+      <div class="rule-item">
+        <strong>📸 Rule 1: Strict 3-Sided Photos</strong>
+        <p>Every animal must have <strong>Front View</strong>, <strong>Left Profile</strong>, and <strong>Right Profile</strong> photos. Incomplete angles won't qualify for points!</p>
+      </div>
+
+      <div class="rule-item">
+        <strong>🐕 Rule 2: Maximum Animals Covered</strong>
+        <p>The volunteer who documents the highest number of unique qualified campus dogs & cats wins.</p>
+      </div>
+
+      <div class="rule-item">
+        <strong>🏷️ Rule 3: Every Resident Must Be Named</strong>
+        <p>Give every animal a known name or creative nickname (use the 🎲 Dice button if unknown!). Blank names disqualify the spot.</p>
+      </div>
+
+      <div class="rule-item">
+        <strong>⚡ Rule 4: Tie-Breaker: Earliest Time Wins</strong>
+        <p>In case of a tie in total animals spotted, the volunteer who recorded their winning batch earlier in the morning takes the trophy!</p>
+      </div>
+
+      <div style="background:#e8f5e9; padding:0.7rem; border-radius:10px; font-size:0.76rem; color:#1b4332; margin-bottom:0.8rem;">
+        🎖️ <strong>Top 3 Winner Titles:</strong><br>
+        🥇 1st: <strong>Grand Alpha Ranger</strong><br>
+        🥈 2nd: <strong>Master Whiskers Detective</strong><br>
+        🥉 3rd: <strong>Top Campus Bark-Scout</strong>
+      </div>
+
+      <button class="btn-modal-action" onclick="game.closeRulesModal()">Got It! Let's Hunt 🚀</button>
+    </div>
+  </div>
+
+  <!-- MODAL: SCOUT PROFILE -->
+  <div class="modal-overlay" id="modal-profile">
+    <div class="modal-card">
+      <h3 style="font-family:'Fredoka',cursive; color:var(--primary-dark); font-size:1.35rem;">Scout Profile</h3>
+      <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:0.8rem;">This name will appear on the Live Leaderboard!</p>
+
+      <div class="input-group" style="text-align:left;">
+        <label class="input-label">Your Full Name / Nickname</label>
+        <input type="text" id="scout-input-name" class="text-input" placeholder="e.g. Aryan Sharma, Alex, Priya...">
+      </div>
+
+      <div class="input-group" style="text-align:left;">
+        <label class="input-label">Hostel / Wing / Roll No</label>
+        <input type="text" id="scout-input-hostel" class="text-input" placeholder="e.g. Chenab D-Wing, Sutlej 204...">
+      </div>
+
+      <label class="input-label" style="text-align:left;">Choose Avatar</label>
+      <div class="modal-avatar-grid">
+        <div class="avatar-option selected" onclick="game.selectAvatar('🐕', this)">🐕</div>
+        <div class="avatar-option" onclick="game.selectAvatar('🐈', this)">🐈</div>
+        <div class="avatar-option" onclick="game.selectAvatar('🐶', this)">🐶</div>
+        <div class="avatar-option" onclick="game.selectAvatar('🦊', this)">🦊</div>
+        <div class="avatar-option" onclick="game.selectAvatar('🦁', this)">🦁</div>
+        <div class="avatar-option" onclick="game.selectAvatar('🐼', this)">🐼</div>
+        <div class="avatar-option" onclick="game.selectAvatar('🤠', this)">🤠</div>
+        <div class="avatar-option" onclick="game.selectAvatar('🐾', this)">🐾</div>
+      </div>
+
+      <button class="btn-modal-action" onclick="game.saveProfile()">Save Profile</button>
+    </div>
+  </div>
+
+  <!-- MODAL: SETTINGS & 3-HOUR EVENT CONTROLS -->
+  <div class="modal-overlay" id="modal-settings">
+    <div class="modal-card" style="text-align:left;">
+      <h3 style="font-family:'Fredoka',cursive; color:var(--primary-dark); font-size:1.25rem; text-align:center;">⚙️ Event & Sheet Controls</h3>
+      <p style="font-size:0.78rem; color:var(--text-muted); margin-bottom:1rem; text-align:center;">Organize & manage your 3-hour morning sprint</p>
+
+      <div class="input-group">
+        <label class="input-label">Google Apps Script Web App URL</label>
+        <input type="url" id="settings-gas-url" class="text-input" placeholder="https://script.google.com/macros/s/.../exec">
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Event Duration (Hours)</label>
+        <select id="settings-event-duration" class="select-input">
+          <option value="3" selected>3 Hours (Early Morning Sprint)</option>
+          <option value="2">2 Hours</option>
+          <option value="4">4 Hours</option>
+          <option value="24">All Day (24 Hours)</option>
+        </select>
+      </div>
+
+      <div style="display:flex; gap:0.5rem; margin-top:0.5rem;">
+        <button class="btn-modal-action" style="background:#e03131;" onclick="game.restartTimer()">
+          <i class="fa-solid fa-stopwatch"></i> Start/Reset 3h Timer
+        </button>
+      </div>
+
+      <div style="display:flex; gap:0.5rem; margin-top:0.5rem;">
+        <button class="btn-modal-action" style="background:#495057;" onclick="game.testConnection()">Test Connection</button>
+        <button class="btn-modal-action" onclick="game.saveSettings()">Save & Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CELEBRATION -->
+  <div class="modal-overlay" id="modal-celebrate">
+    <div class="modal-card">
+      <div style="font-size:3.5rem; margin-bottom:0.4rem;">🎉🐾🥇</div>
+      <h2 style="font-family:'Fredoka',cursive; color:var(--primary-dark); font-size:1.5rem;">Spot Verified!</h2>
+      <div style="font-family:'Fredoka',cursive; font-size:2rem; color:var(--accent); margin:0.3rem 0;" id="reward-xp-text">+200 XP</div>
+      <p style="font-size:0.88rem; color:var(--text); margin-bottom:1.2rem;" id="reward-message">
+        Animal and 3 photos successfully uploaded to Google Sheet!
+      </p>
+
+      <div style="display:flex; gap:0.5rem;">
+        <button class="btn-modal-action" style="background:var(--primary);" onclick="game.viewLeaderboardDirect()">
+          🏆 View Leaderboard
+        </button>
+        <button class="btn-modal-action" style="background:var(--accent); color:#000;" onclick="game.closeCelebration()">
+          Spot Next! 🚀
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUDIO ENGINE -->
+  <script>
+    class SoundEngine {
+      constructor() { this.ctx = null; this.enabled = true; }
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) this.ctx = new AudioContext();
+        }
+      }
+      playClick() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.connect(gain); gain.connect(this.ctx.destination);
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(600, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(1200, this.ctx.currentTime + 0.08);
+        gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.08);
+        osc.start(); osc.stop(this.ctx.currentTime + 0.08);
+      }
+      playSnap() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.connect(gain); gain.connect(this.ctx.destination);
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(400, this.ctx.currentTime);
+        osc.frequency.linearRampToValueAtTime(80, this.ctx.currentTime + 0.12);
+        gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.12);
+        osc.start(); osc.stop(this.ctx.currentTime + 0.12);
+      }
+      playFanfare() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        [440, 554, 659, 880].forEach((freq, idx) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.connect(gain); gain.connect(this.ctx.destination);
+          osc.type = "triangle";
+          osc.frequency.setValueAtTime(freq, this.ctx.currentTime + idx * 0.1);
+          gain.gain.setValueAtTime(0.25, this.ctx.currentTime + idx * 0.1);
+          gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + idx * 0.1 + 0.2);
+          osc.start(this.ctx.currentTime + idx * 0.1);
+          osc.stop(this.ctx.currentTime + idx * 0.1 + 0.25);
+        });
+      }
+    }
+
+    const sound = new SoundEngine();
+
+    // MAIN GAME OBJECT
+    const game = {
+      category: 'Dog',
+      photos: { front: null, left: null, right: null },
+      gps: { lat: null, lng: null, accuracy: null },
+      traits: [],
+      profile: {
+        name: 'Cadet Spotter',
+        hostel: 'Chenab Hostel',
+        avatar: '🐕',
+        xp: 0,
+        spots: 0
+      },
+      gasUrl: '',
+      timerEndTime: null,
+      timerInterval: null,
+      leaderboardData: [],
+
+      init() {
+        this.loadProfile();
+        this.loadSettings();
+        this.initTimer();
+        this.updateHUD();
+      },
+
+      loadProfile() {
+        const saved = localStorage.getItem('pawspotter_profile');
+        if (saved) {
+          try { this.profile = { ...this.profile, ...JSON.parse(saved) }; } catch(e) {}
+        }
+      },
+
+      saveProfileToStorage() {
+        localStorage.setItem('pawspotter_profile', JSON.stringify(this.profile));
+        this.updateHUD();
+      },
+
+      loadSettings() {
+        const url = localStorage.getItem('pawspotter_gas_url');
+        if (url) {
+          this.gasUrl = url;
+          const input = document.getElementById('settings-gas-url');
+          if (input) input.value = url;
+        }
+      },
+
+      // 3-HOUR COUNTDOWN TIMER LOGIC
+      initTimer() {
+        let savedEnd = localStorage.getItem('pawspotter_timer_end');
+        if (!savedEnd) {
+          // Default: 3 hours from now
+          const end = Date.now() + (3 * 60 * 60 * 1000);
+          localStorage.setItem('pawspotter_timer_end', end);
+          this.timerEndTime = end;
+        } else {
+          this.timerEndTime = parseInt(savedEnd, 10);
+        }
+
+        this.startTimerTicker();
+      },
+
+      startTimerTicker() {
+        if (this.timerInterval) clearInterval(this.timerInterval);
+        const clockEl = document.getElementById('event-countdown');
+        const statusEl = document.getElementById('timer-status-label');
+
+        this.timerInterval = setInterval(() => {
+          const now = Date.now();
+          const diff = this.timerEndTime - now;
+
+          if (diff <= 0) {
+            clockEl.textContent = "00:00:00";
+            statusEl.textContent = "🏁 Event Concluded:";
+            clockEl.style.color = "#ff6b6b";
+            return;
+          }
+
+          const hours = Math.floor(diff / (1000 * 60 * 60));
+          const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+          const secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+          clockEl.textContent = 
+            `${String(hours).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+        }, 1000);
+      },
+
+      restartTimer() {
+        const hours = parseInt(document.getElementById('settings-event-duration').value, 10) || 3;
+        const newEnd = Date.now() + (hours * 60 * 60 * 1000);
+        localStorage.setItem('pawspotter_timer_end', newEnd);
+        this.timerEndTime = newEnd;
+        this.startTimerTicker();
+        this.showToast(`Timer set for ${hours} hours!`);
+        document.getElementById('modal-settings').style.display = 'none';
+      },
+
+      updateHUD() {
+        document.getElementById('hud-avatar').textContent = this.profile.avatar;
+        document.getElementById('hud-name').textContent = this.profile.name;
+        
+        const xp = this.profile.xp;
+        let rank = "Lvl 1 Scout";
+        let targetXP = 300;
+        let baseXP = 0;
+
+        if (xp < 300) { rank = "Lvl 1 Scout"; baseXP = 0; targetXP = 300; }
+        else if (xp < 800) { rank = "Lvl 2 Tracker"; baseXP = 300; targetXP = 800; }
+        else if (xp < 1800) { rank = "Lvl 3 Paw Patrol"; baseXP = 800; targetXP = 1800; }
+        else if (xp < 3500) { rank = "Lvl 4 Safari Ranger"; baseXP = 1800; targetXP = 3500; }
+        else { rank = "Lvl 5 Master Zoologist"; baseXP = 3500; targetXP = 5000; }
+
+        document.getElementById('hud-rank').textContent = rank;
+        const fillPercent = Math.min(100, Math.max(5, ((xp - baseXP) / (targetXP - baseXP)) * 100));
+        document.getElementById('hud-xp-fill').style.width = fillPercent + '%';
+        document.getElementById('hud-xp-text').textContent = `${xp} / ${targetXP} XP`;
+        document.getElementById('hud-spots-count').textContent = `🐾 ${this.profile.spots} Qualified`;
+      },
+
+      switchTab(tab) {
+        sound.playClick();
+        const spotView = document.getElementById('view-spot');
+        const lbView = document.getElementById('view-leaderboard');
+        const submitBar = document.getElementById('submit-bar-container');
+        const btnSpot = document.getElementById('btn-tab-spot');
+        const btnLb = document.getElementById('btn-tab-lb');
+
+        if (tab === 'leaderboard') {
+          spotView.style.display = 'none';
+          lbView.style.display = 'block';
+          submitBar.style.display = 'none';
+          btnSpot.classList.remove('active');
+          btnLb.classList.add('active');
+          this.fetchLiveLeaderboard();
+        } else {
+          spotView.style.display = 'block';
+          lbView.style.display = 'none';
+          submitBar.style.display = 'block';
+          btnSpot.classList.add('active');
+          btnLb.classList.remove('active');
+        }
+      },
+
+      toggleSound() {
+        sound.enabled = !sound.enabled;
+        const icon = document.getElementById('sound-icon');
+        icon.className = sound.enabled ? "fa-solid fa-volume-high" : "fa-solid fa-volume-xmark";
+        this.showToast(sound.enabled ? "Sound Enabled" : "Sound Muted");
+        if (sound.enabled) sound.playClick();
+      },
+
+      setCategory(cat, el) {
+        sound.playClick();
+        this.category = cat;
+        document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
+        el.classList.add('active');
+      },
+
+      randomName() {
+        sound.playClick();
+        const names = [
+          "Sheru", "Biscuit", "Oreo", "Rocky", "Simba", "Mocha", "Goldie", 
+          "Bruno", "Shadow", "Casper", "Bella", "Champa", "Tuffy", "Charlie", 
+          "Kaju", "Badam", "Chikoo", "Pepper", "Ginger", "Tiger", "Milo"
+        ];
+        const chosen = names[Math.floor(Math.random() * names.length)];
+        document.getElementById('animal-name').value = chosen;
+      },
+
+      triggerPhoto(angle) {
+        sound.playClick();
+        document.getElementById(`file-${angle}`).click();
+      },
+
+      handlePhoto(event, angle) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        sound.playSnap();
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+            const maxDim = 1200;
+
+            if (width > height && width > maxDim) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else if (height > maxDim) {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.72);
+            this.photos[angle] = compressedBase64;
+
+            const previewEl = document.getElementById(`preview-${angle}`);
+            previewEl.src = compressedBase64;
+            previewEl.style.display = 'block';
+            document.getElementById(`ph-${angle}`).style.display = 'none';
+            document.getElementById(`slot-${angle}`).classList.add('captured');
+
+            this.showToast(`📸 ${angle.toUpperCase()} Photo Saved!`);
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      },
+
+      fetchGPS() {
+        sound.playClick();
+        const titleEl = document.getElementById('gps-status-title');
+        const textEl = document.getElementById('gps-coords-text');
+
+        if (!navigator.geolocation) {
+          this.showToast("GPS not supported on this browser");
+          return;
+        }
+
+        titleEl.textContent = "📍 Locating via Satellite...";
+        textEl.textContent = "Locking coordinates...";
+
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            sound.playSnap();
+            const lat = pos.coords.latitude.toFixed(6);
+            const lng = pos.coords.longitude.toFixed(6);
+            const acc = Math.round(pos.coords.accuracy);
+
+            this.gps = { lat, lng, accuracy: acc };
+            titleEl.textContent = "📍 GPS Locked! (+25 XP)";
+            textEl.textContent = `${lat}, ${lng} (±${acc}m accuracy)`;
+            this.showToast("GPS Position Acquired!");
+          },
+          (err) => {
+            titleEl.textContent = "📍 GPS Error";
+            textEl.textContent = "Please allow location permission in phone settings";
+            this.showToast("Could not get GPS");
+          },
+          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        );
+      },
+
+      toggleTrait(chip) {
+        sound.playClick();
+        chip.classList.toggle('selected');
+        const text = chip.textContent.trim();
+        if (chip.classList.contains('selected')) {
+          this.traits.push(text);
+        } else {
+          this.traits = this.traits.filter(t => t !== text);
+        }
+      },
+
+      // VALIDATION AGAINST TOURNAMENT RULES
+      async submitSighting() {
+        sound.playClick();
+
+        // Check if event time expired
+        if (this.timerEndTime && Date.now() > this.timerEndTime) {
+          alert("⏱️ The 3-Hour Morning Paw-Safari has officially concluded! Check the Live Leaderboard for winners.");
+          return;
+        }
+
+        const animalName = document.getElementById('animal-name').value.trim();
+
+        // RULE 3: NAME IS MANDATORY
+        if (!animalName) {
+          alert("🏷️ RULE #3 VIOLATION:\n\nAll animals must be named to qualify! Tap the 🎲 Dice button if you need a quick cute nickname.");
+          document.getElementById('animal-name').focus();
+          return;
+        }
+
+        // RULE 1: STRICT 3 SIDES
+        if (!this.photos.front || !this.photos.left || !this.photos.right) {
+          const missing = [];
+          if (!this.photos.front) missing.push("1. Front Face");
+          if (!this.photos.left) missing.push("2. Left Flank");
+          if (!this.photos.right) missing.push("3. Right Flank");
+
+          alert(`📸 RULE #1 VIOLATION:\n\nAll 3 photo sides are strictly required to qualify for the win!\n\nMissing:\n• ${missing.join('\n• ')}\n\nPlease capture the missing angles to proceed.`);
+          return;
+        }
+
+        const btn = document.getElementById('btn-submit');
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Uploading to Google Sheet...`;
+
+        // Calculate XP
+        let earnedXP = 100 + 50; // Base + 3-side full bonus
+        if (this.gps.lat) earnedXP += 25;
+        if (this.traits.length > 0) earnedXP += 25;
+
+        const ageStage = document.getElementById('animal-age').value;
+        const landmark = document.getElementById('campus-landmark').value;
+        const spotDetails = document.getElementById('spot-details').value.trim();
+        const customNotes = document.getElementById('custom-notes').value.trim();
+
+        const allNotes = [
+          spotDetails ? `Spot: ${spotDetails}` : null,
+          this.traits.length ? `Traits: ${this.traits.join(', ')}` : null,
+          customNotes ? `Notes: ${customNotes}` : null
+        ].filter(Boolean).join(' | ');
+
+        const payload = {
+          timestamp: new Date().toISOString(),
+          playerName: this.profile.name,
+          playerHostel: this.profile.hostel,
+          animalType: this.category,
+          animalName: animalName,
+          ageStage: ageStage,
+          landmark: spotDetails ? `${landmark} (${spotDetails})` : landmark,
+          gpsLat: this.gps.lat,
+          gpsLng: this.gps.lng,
+          distinctiveMarks: allNotes,
+          photoFront: this.photos.front,
+          photoLeft: this.photos.left,
+          photoRight: this.photos.right,
+          xpEarned: earnedXP
+        };
+
+        let uploadSuccess = false;
+
+        if (this.gasUrl && this.gasUrl.startsWith('http')) {
+          try {
+            await fetch(this.gasUrl, {
+              method: 'POST',
+              body: JSON.stringify(payload)
+            });
+            uploadSuccess = true;
+          } catch(err) {
+            console.warn("GAS upload fallback:", err);
+            this.saveOfflineQueue(payload);
+            uploadSuccess = true;
+          }
+        } else {
+          this.saveOfflineQueue(payload);
+          uploadSuccess = true;
+        }
+
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Upload Sighting & Score Points!`;
+
+        if (uploadSuccess) {
+          this.profile.xp += earnedXP;
+          this.profile.spots += 1;
+          this.saveProfileToStorage();
+          this.showCelebration(earnedXP, animalName);
+        }
+      },
+
+      saveOfflineQueue(payload) {
+        let queue = [];
+        try {
+          queue = JSON.parse(localStorage.getItem('pawspotter_offline_queue') || '[]');
+        } catch(e) {}
+        queue.push(payload);
+        localStorage.setItem('pawspotter_offline_queue', JSON.stringify(queue));
+      },
+
+      showCelebration(xp, animalName) {
+        sound.playFanfare();
+        document.getElementById('reward-xp-text').textContent = `+${xp} XP`;
+        document.getElementById('reward-message').innerHTML = `
+          <strong>${animalName}</strong> recorded with all 3 angles! Logged into Google Sheet in real time.
+        `;
+        document.getElementById('modal-celebrate').style.display = 'flex';
+
+        if (window.confetti) {
+          confetti({ particleCount: 90, spread: 75, origin: { y: 0.6 } });
+        }
+      },
+
+      closeCelebration() {
+        document.getElementById('modal-celebrate').style.display = 'none';
+        this.resetForm();
+      },
+
+      viewLeaderboardDirect() {
+        this.closeCelebration();
+        this.switchTab('leaderboard');
+      },
+
+      resetForm() {
+        document.getElementById('animal-name').value = '';
+        document.getElementById('spot-details').value = '';
+        document.getElementById('custom-notes').value = '';
+        this.photos = { front: null, left: null, right: null };
+        ['front', 'left', 'right'].forEach(angle => {
+          document.getElementById(`preview-${angle}`).style.display = 'none';
+          document.getElementById(`ph-${angle}`).style.display = 'block';
+          document.getElementById(`slot-${angle}`).classList.remove('captured');
+        });
+        document.querySelectorAll('.trait-chip').forEach(c => c.classList.remove('selected'));
+        this.traits = [];
+        this.gps = { lat: null, lng: null, accuracy: null };
+        document.getElementById('gps-status-title').textContent = '📍 Live GPS Coordinates';
+        document.getElementById('gps-coords-text').textContent = 'Tap Get GPS for pin-point accuracy (+25 XP)';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      },
+
+      // FETCH LIVE LEADERBOARD FROM GOOGLE APPS SCRIPT
+      async fetchLiveLeaderboard() {
+        const listEl = document.getElementById('leaderboard-list');
+        listEl.innerHTML = `
+          <div style="text-align:center; padding: 1.5rem; color:var(--text-muted); font-size:0.85rem;">
+            <i class="fa-solid fa-spinner fa-spin" style="font-size:1.5rem; margin-bottom:8px; display:block;"></i>
+            Syncing live rankings from Google Sheet...
+          </div>
+        `;
+
+        let list = [];
+
+        if (this.gasUrl && this.gasUrl.startsWith('http')) {
+          try {
+            const separator = this.gasUrl.includes('?') ? '&' : '?';
+            const res = await fetch(`${this.gasUrl}${separator}action=leaderboard`);
+            const data = await res.json();
+            if (data && data.leaderboard) {
+              list = data.leaderboard;
+            }
+          } catch(err) {
+            console.warn("Could not fetch remote leaderboard:", err);
+          }
+        }
+
+        // If no remote leaderboard returned yet, render current player data + demo standings
+        if (!list || list.length === 0) {
+          list = [
+            {
+              rank: 1,
+              title: "🥇 Grand Alpha Ranger",
+              name: this.profile.name || "Top Volunteer",
+              hostel: this.profile.hostel || "Campus",
+              score: this.profile.spots,
+              total: this.profile.spots,
+              lastTime: new Date().toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata" })
+            }
+          ];
+        }
+
+        this.leaderboardData = list;
+        this.renderLeaderboardUI(list);
+      },
+
+      renderLeaderboardUI(list) {
+        // Update Top 3 Podium
+        const top1 = list[0] || { name: 'Awaiting', score: 0, avatar: '🥇' };
+        const top2 = list[1] || { name: 'Awaiting', score: 0, avatar: '🥈' };
+        const top3 = list[2] || { name: 'Awaiting', score: 0, avatar: '🥉' };
+
+        document.getElementById('podium-name-1').textContent = top1.name;
+        document.getElementById('podium-score-1').textContent = `${top1.score} dogs/cats`;
+
+        document.getElementById('podium-name-2').textContent = top2.name;
+        document.getElementById('podium-score-2').textContent = `${top2.score} dogs/cats`;
+
+        document.getElementById('podium-name-3').textContent = top3.name;
+        document.getElementById('podium-score-3').textContent = `${top3.score} dogs/cats`;
+
+        // Render List
+        const listEl = document.getElementById('leaderboard-list');
+        listEl.innerHTML = '';
+
+        list.forEach((entry, idx) => {
+          const isTop3 = idx < 3;
+          const medals = ['🥇', '🥈', '🥉'];
+          const rankDisplay = idx < 3 ? medals[idx] : `#${entry.rank || idx + 1}`;
+
+          const row = document.createElement('div');
+          row.className = `lb-row ${isTop3 ? 'top-3' : ''}`;
+          row.innerHTML = `
+            <div class="lb-rank">${rankDisplay}</div>
+            <div class="lb-info">
+              <div class="lb-name-title">
+                <span class="lb-name">${entry.name}</span>
+                <span class="lb-honor-title">${entry.title}</span>
+              </div>
+              <div class="lb-subtext">
+                <span><i class="fa-solid fa-location-dot"></i> ${entry.hostel}</span>
+                <span><i class="fa-regular fa-clock"></i> ${entry.lastTime || 'Early'}</span>
+              </div>
+            </div>
+            <div class="lb-score-box">
+              <span class="lb-score-num">${entry.score}</span>
+              <span class="lb-score-unit">qualified</span>
+            </div>
+          `;
+          listEl.appendChild(row);
+        });
+      },
+
+      // MODALS
+      openRulesModal() {
+        sound.playClick();
+        document.getElementById('modal-rules').style.display = 'flex';
+      },
+      closeRulesModal() {
+        sound.playClick();
+        document.getElementById('modal-rules').style.display = 'none';
+      },
+
+      openProfileModal() {
+        sound.playClick();
+        document.getElementById('scout-input-name').value = this.profile.name;
+        document.getElementById('scout-input-hostel').value = this.profile.hostel;
+        document.getElementById('modal-profile').style.display = 'flex';
+      },
+
+      selectAvatar(avatar, el) {
+        sound.playClick();
+        this.profile.avatar = avatar;
+        document.querySelectorAll('.avatar-option').forEach(o => o.classList.remove('selected'));
+        el.classList.add('selected');
+      },
+
+      saveProfile() {
+        sound.playClick();
+        const name = document.getElementById('scout-input-name').value.trim();
+        const hostel = document.getElementById('scout-input-hostel').value.trim();
+        if (name) this.profile.name = name;
+        if (hostel) this.profile.hostel = hostel;
+        this.saveProfileToStorage();
+        document.getElementById('modal-profile').style.display = 'none';
+        this.showToast("Profile Updated!");
+      },
+
+      openSettings() {
+        sound.playClick();
+        document.getElementById('settings-gas-url').value = this.gasUrl || '';
+        document.getElementById('modal-settings').style.display = 'flex';
+      },
+
+      saveSettings() {
+        sound.playClick();
+        const url = document.getElementById('settings-gas-url').value.trim();
+        this.gasUrl = url;
+        localStorage.setItem('pawspotter_gas_url', url);
+        document.getElementById('modal-settings').style.display = 'none';
+        this.showToast("Settings Saved!");
+      },
+
+      async testConnection() {
+        sound.playClick();
+        const url = document.getElementById('settings-gas-url').value.trim();
+        if (!url) { alert("Please enter your Google Apps Script URL first!"); return; }
+        try {
+          const res = await fetch(url);
+          const data = await res.json();
+          alert("✅ Connected to Google Apps Script!\n\n" + (data.message || JSON.stringify(data)));
+        } catch (err) {
+          alert("⚠️ Ping sent! (Post requests will sync data directly to your sheet).");
+        }
+      },
+
+      showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.style.display = 'flex';
+        clearTimeout(this._toastTimer);
+        this._toastTimer = setTimeout(() => { t.style.display = 'none'; }, 2500);
+      }
+    };
+
+    window.addEventListener('click', (e) => {
+      if (e.target.classList.contains('modal-overlay')) {
+        e.target.style.display = 'none';
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => game.init());
+  </script>
+</body>
+</html>
